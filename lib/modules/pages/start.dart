@@ -1,43 +1,11 @@
-import 'dart:ffi';
-
 import 'package:attandace_teacher/controllers/loginController.dart';
-import 'package:attandace_teacher/data/userModel.dart';
-import 'package:attandace_teacher/modules/pages/home.dart';
-import 'package:attandace_teacher/services/auth_api.dart';
-import 'package:attandace_teacher/widgets/loading.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:get_storage/get_storage.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class Start extends StatefulWidget {
-  static const String routeName = '/';
-  const Start({super.key});
-
-  @override
-  State<Start> createState() => _StartState();
-}
-
-class _StartState extends State<Start> {
-  TextEditingController signInController = TextEditingController();
-
-  UserModel? usermodel;
-  final box = GetStorage();
-  TextEditingController cCardId = TextEditingController();
-
-  Future<void> login(String card) async {
-    usermodel = await AuthApi().loginApi(card);
-    showLoading();
-    print(usermodel?.status);
-    if (usermodel?.status == 200) {
-      await box.write("master_card", card);
-      await box.write("token", usermodel!.token!);
-      await box.write("name", usermodel!.name!);
-      await box.write("email", usermodel!.email!);
-      stopLoading();
-      Navigator.pushReplacementNamed(context, Home.routeName);
-    }
-  }
+class start extends GetView<loginController> {
+  const start({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -118,10 +86,9 @@ class _StartState extends State<Start> {
                                 width: 300,
                               ),
                               TextFormField(
-                                controller: signInController,
+                                controller: controller.cCardId,
                                 autofocus: true,
-                                onEditingComplete: () =>
-                                    login(signInController.text),
+                                onEditingComplete: () => controller.login(),
                                 decoration: InputDecoration(
                                   fillColor: Colors.white,
                                   border: InputBorder.none,

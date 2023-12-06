@@ -1,26 +1,35 @@
+import 'dart:io';
+
 import 'package:attandace_teacher/modules/routes/app_pages.dart';
+// import 'package:attandace_teacher/services/background_services.dart';
+import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
+import 'package:attandace_teacher/services/background_services.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:bot_toast/bot_toast.dart';
+import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 
-void main() {
-  runApp(const MyApp());
-}
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await GetStorage.init();
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final BackgroundServices _service = BackgroundServices();
+  _service.initializeIsolate();
 
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        useMaterial3: true,
-      ),
-      builder: BotToastInit(),
-      navigatorObservers: [BotToastNavigatorObserver()],
-      initialRoute: AppPage.INITIAL,
-      routes: AppPage.routes,
-    );
-  }
+  if (Platform.isAndroid) await AndroidAlarmManager.initialize();
+
+  runApp(GetMaterialApp(
+    title: 'Flutter Demo',
+    initialRoute: AppPages.INITIAL,
+    onInit: () {
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.landscapeRight,
+        DeviceOrientation.landscapeLeft,
+      ]);
+    },
+    builder: BotToastInit(),
+    getPages: AppPages.routes,
+    navigatorObservers: [BotToastNavigatorObserver()],
+  ));
 }
